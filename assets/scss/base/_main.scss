@@ -1,0 +1,54 @@
+button,
+input,
+optgroup,
+select,
+textarea {
+  margin: 0;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+button,
+input {
+  overflow: visible;
+}
+
+button,
+select {
+  text-transform: none;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #ffff;
+}
+
+// 手機滿屏設置
+// .app-container {
+//   padding-top: constant(safe-area-inset-top);
+//   padding-right: constant(safe-area-inset-right);
+//   padding-bottom: constant(safe-area-inset-bottom);
+//   padding-left: constant(safe-area-inset-left);
+// }
+
+// @supports (padding: max(0px)) {
+//   body {
+//     padding-top: constant(safe-area-inset-top); /* 適用用於較舊版本的iOS */
+//     padding-top: env(safe-area-inset-top);
+//     padding-bottom: env(safe-area-inset-bottom);
+//     padding-left: env(safe-area-inset-left);
+//     padding-right: env(safe-area-inset-right);
+//   }
+// }

@@ -1,0 +1,52 @@
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@100;200;300;400;500;600;700;800;900&family=Roboto:wght@100;300;400;500;700;900&display=swap");
+
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+a,
+span {
+  font-family: "Noto Sans TC", sans-serif, "Roboto", sans-serif;
+}
+
+h1 {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  line-height: 28px;
+  text-align: center;
+}
+h2 {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  line-height: 24px;
+}
+h3 {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  line-height: 20px;
+}
+h4 {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  line-height: 18px;
+}
+p {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 14px;
+  letter-spacing: 1px;
+}
+span {
+  font-size: 14px;
+  font-weight: 300;
+  line-height: 14px;
+  letter-spacing: 1px;
+}
