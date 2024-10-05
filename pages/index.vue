@@ -1,51 +1,186 @@
 <template>
   <div class="app-container">
-    <div class="statistic-wrap">
-      <div class="statistic-map">
+    <header class="header">
+      <div class="header__main">
+        <div class="header__logoWrap">
+          <div class="header__logo">
+            <img src="@/assets/icon/logo.svg" alt="logo" />
+          </div>
+          <h1 class="header__title">台灣歷年總統 都幾?</h1>
+        </div>
+        <div class="header__select">
+          <p>選擇年份</p>
+          <div class="select__group">
+            <select
+              name="year"
+              id="year"
+              v-model="params.year"
+              @change="actionSearchYear"
+            >
+              <option value="2024">2024</option>
+              <option value="2020">2020</option>
+              <option value="1996">1996</option>
+            </select>
+            <select name="county" id="county" v-model="params.county">
+              <option value="all">all</option>
+              <option value="臺北市">臺北市</option>
+              <option value="新北市">新北市</option>
+            </select>
+            <select name="town" id="town" v-model="params.town">
+              <option value="all">all</option>
+              <option value="松山區">松山區</option>
+              <option value="信義區">信義區</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="header__link">
+        <span>分享</span>
+        <img src="@/assets/icon/facebook.svg" alt="facebook" />
+        <img src="@/assets/icon/instagram.svg" alt="instagram" />
+        <img src="@/assets/icon/youtube.svg" alt="youtube" />
+      </div>
+    </header>
+    <div class="statistic">
+      <div class="statistic__map">
         <div id="taiwanMap" ref="taiwanMap"></div>
       </div>
-      <div class="statistic-people">
-        <div class="people-select">
-          <select
-            name="year"
-            id="year"
-            v-model="selectYear"
-            @change="actionSearch"
-          >
-            <option value="112">112</option>
-            <option value="111">111</option>
-            <option value="110">110</option>
-          </select>
-          <select
-            name="county"
-            id="county"
-            v-model="selectCounty"
-            @change="changeCounty(selectCounty)"
-          >
-            <option
-              v-for="(item, index) in countyRegions"
-              :key="index"
-              :value="index"
-              :label="index"
-            ></option>
-          </select>
-        </div>
-        <div class="people-colum">
-          <div id="barColum" ref="barColum"></div>
-        </div>
-        <ul>
-          <li v-for="(item, index) in test" :key="index"></li>
-        </ul>
-        <ul class="people-list">
-          <li
-            class="people-item"
-            v-for="(itemm, index) in peopleData"
-            :key="index"
-          >
-            <h3>{{ itemm.site_id }}</h3>
-            <p>年底人口數 : {{ itemm.people_total }}</p>
-          </li>
-        </ul>
+      <div class="statistic__main">
+        <h2>全臺縣市總統得票</h2>
+        <section class="president">
+          <h3>總統得票數</h3>
+          <div class="president__row">
+            <div class="president__col club">
+              <ul class="club__list">
+                <li class="club__item">
+                  <div class="club__pic">
+                    <img
+                      src="@/assets/icon/face-with-medical-mask.svg"
+                      alt="face"
+                    />
+                  </div>
+                  <div class="club__text">
+                    <h4>{{ "民進黨" }}</h4>
+                    <h5>{{ "德古拉" }}</h5>
+                    <p>
+                      <strong>{{ "8,170,231" }}</strong
+                      >票
+                    </p>
+                  </div>
+                </li>
+                <li class="club__item">
+                  <div class="club__pic">
+                    <img
+                      src="@/assets/icon/face-with-medical-mask.svg"
+                      alt="face"
+                    />
+                  </div>
+                  <div class="club__text">
+                    <h4 class="elected">{{ "民進黨" }}</h4>
+                    <h5>{{ "德古拉" }}</h5>
+                    <p>
+                      <strong>{{ "8,170,231" }}</strong
+                      >票
+                    </p>
+                  </div>
+                </li>
+                <li class="club__item">
+                  <div class="club__pic">
+                    <img
+                      src="@/assets/icon/face-with-medical-mask.svg"
+                      alt="face"
+                    />
+                  </div>
+                  <div class="club__text">
+                    <h4>{{ "民進黨" }}</h4>
+                    <h5>{{ "德古拉" }}</h5>
+                    <p>
+                      <strong>{{ "8,170,231" }}</strong
+                      >票
+                    </p>
+                  </div>
+                </li>
+              </ul>
+              <div class="club__line"></div>
+            </div>
+            <div class="president__col rate">
+              <div class="rate__graph"></div>
+              <ul class="rate__list">
+                <li class="rate__item">
+                  <h4>投票數</h4>
+                  <strong>{{ "12,448,302" }}</strong>
+                </li>
+                <li class="rate__item">
+                  <h4>投票數</h4>
+                  <strong>{{ "12,448,302" }}</strong>
+                </li>
+                <li class="rate__item">
+                  <h4>投票數</h4>
+                  <strong>{{ "12,448,302" }}</strong>
+                </li>
+                <li class="rate__item">
+                  <h4>投票數</h4>
+                  <strong>{{ "12,448,302" }}</strong>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+        <section class="history">
+          <div class="history__row">
+            <div class="history__col">
+              <div class="history__header">
+                <h3>歷屆政黨得票數</h3>
+                <ul class="header__list">
+                  <li class="header__item"><span></span>{{ "民進黨" }}</li>
+                  <li class="header__item"><span></span>{{ "民進黨" }}</li>
+                  <li class="header__item"><span></span>{{ "民進黨" }}</li>
+                </ul>
+              </div>
+              <div class="history__bar">
+                <div id="barColum" ref="barColum"></div>
+              </div>
+            </div>
+            <div class="history__col">
+              <div class="history__header">
+                <h3>歷屆政黨得票數</h3>
+                <ul class="header__list">
+                  <li class="header__item"><span></span>{{ "民進黨" }}</li>
+                  <li class="header__item"><span></span>{{ "民進黨" }}</li>
+                  <li class="header__item"><span></span>{{ "民進黨" }}</li>
+                </ul>
+              </div>
+              <div class="history__bar">
+                <div id="barRate" ref="barRate"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section class="overview">
+          <h3>各縣市投票總覽</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>縣市</th>
+                <th>得票率</th>
+                <th>當選人</th>
+                <th>投票數</th>
+                <th>投票率</th>
+                <th>功能</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>臺北</td>
+                <td>333</td>
+                <td>3333</td>
+                <td>33333333</td>
+                <td>33333</td>
+                <td>></td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
       </div>
     </div>
   </div>
@@ -53,7 +188,9 @@
 
 <script setup>
 import * as echarts from "echarts";
-import taiwanJSON from "../../assets/json/county.json";
+import taiwanJSON from "@/assets/json/taiwan.json";
+import voteAllYear from "@/assets/json/vote-all-year.json";
+import vote2024 from "@/assets/json/vote-2024.json";
 
 onMounted(() => {
   window.addEventListener("resize", function () {
@@ -62,44 +199,21 @@ onMounted(() => {
   });
   drawTaiwan();
   drawBar();
-  actionSearch();
 });
 
-const test = reactive({
-  民眾黨: {
-    total: 366854,
-    rate: 23.79,
-  },
-  民進黨: {
-    total: 587899,
-    rate: 38.13,
-  },
-  國民黨: {
-    total: 587258,
-    rate: 38.08,
-  },
+const color = ["#fac858", "#5470c6", "#91cc75"];
+
+const params = reactive({
+  year: "2024",
+  county: "臺北市",
+  town: "松山區",
 });
 
-const selectYear = ref("112");
-const selectCounty = ref("新北市");
-const populationInfo = reactive({
-  data: {},
-});
-// const url = computed(
-//   () =>
-//     `https://www.ris.gov.tw/rs-opendata/api/v1/datastore/ODRP048/${selectYear.value}`
-// );
-// const actionSearch = async () => {
-//   const response = await $fetch(url.value);
-//   populationInfo.data = response;
-// };
-
-const peopleData = computed(() => {
-  const result = populationInfo.data.responseData || [];
-  const filterResult = result.filter((item) =>
-    item.site_id.startsWith(selectCounty.value)
-  );
-  return filterResult;
+const voteInfo = reactive({
+  data: {
+    all: voteAllYear, // 原有資料
+    year2024: vote2024, // 新增2024年的資料
+  },
 });
 
 const countyRegions = reactive({
@@ -223,62 +337,262 @@ const drawBar = async () => {
 };
 </script>
 <style lang="scss">
-.statistic-wrap {
+.statistic {
   display: flex;
-}
 
-.statistic-map {
-  width: 500px;
-  height: calc(100vh - 60px);
-  position: sticky;
-  top: 60px;
-  background: #e4faff;
+  .statistic__map {
+    width: 500px;
+    height: calc(100vh - 60px);
+    position: sticky;
+    top: 60px;
+    background: #e4faff;
 
-  #taiwanMap {
-    width: 100%;
-    height: 100%;
-    background: #ffff;
-    margin: 0 auto;
-  }
-}
-
-.statistic-people {
-  width: 60%;
-  box-sizing: border-box;
-  padding: 20px;
-
-  .people-select {
-    margin-bottom: 20px;
-  }
-
-  .people-colum {
-    width: 100%;
-    height: 300px;
-
-    #barColum {
+    #taiwanMap {
       width: 100%;
       height: 100%;
       background: #ffff;
       margin: 0 auto;
     }
   }
+  .statistic__main {
+    width: calc(100% - 500px);
+    box-sizing: border-box;
+    padding: 32px 48px;
 
-  .people-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
-    border-bottom: 1px solid #aaaa;
+    h2 {
+      font-size: 28px;
+      font-weight: 700;
+      line-height: 42px;
+      color: #334155;
+      margin-bottom: 24px;
+    }
+  }
+  // 總統得票數
+  .president {
+    padding: 16px;
+    border-radius: 12px;
+    background: #f3f4f4;
+    margin-bottom: 16px;
 
     h3 {
-      font-size: 16px;
-      font-weight: 400;
-      color: #202020;
+      font-size: 20px;
+      font-weight: 700;
+      line-height: 30px;
+      margin-top: 8px;
+      margin-bottom: 16px;
+      color: #334155;
     }
 
-    p {
-      font-size: 14px;
-      color: #535353;
+    .president__row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .president__col {
+      width: 48%;
+      background: #ffffff;
+      border-radius: 12px;
+    }
+    .club {
+      padding: 30px 24px;
+
+      .club__list {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+      }
+      .club__item {
+        width: 30%;
+        display: flex;
+        justify-content: flex-start;
+        align-items: start;
+      }
+      .club__pic {
+        box-sizing: border-box;
+        width: 48px;
+        width: 48px;
+        border-radius: 16px;
+        background: #8082ff;
+        padding: 10px;
+        margin-right: 12px;
+      }
+      .club__text {
+        position: relative;
+
+        h4 {
+          font-size: 12px;
+          font-weight: 400;
+          line-height: 18px;
+          color: #64748b;
+          margin-bottom: 2px;
+
+          &.elected {
+            &::after {
+              content: "";
+              position: absolute;
+              width: 24px;
+              height: 24px;
+              top: 20px;
+              right: 20px;
+              background: no-repeat center url("@/assets/icon/elected.svg");
+            }
+          }
+        }
+        h5 {
+          font-size: 16px;
+          font-weight: 400;
+          line-height: 24px;
+          color: #334155;
+          margin-bottom: 2px;
+        }
+        p {
+          font-size: 16px;
+          font-weight: 400;
+          line-height: 24px;
+          color: #334155;
+
+          strong {
+            font-weight: 700;
+          }
+        }
+      }
+      .club__line {
+        width: 100%;
+        height: 18px;
+        border-radius: 50px;
+        background: #8082ff;
+      }
+    }
+    .rate {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      padding: 18px 24px;
+      margin-left: 16px;
+
+      .rate__graph {
+        width: 124px;
+        height: 124px;
+        margin-right: 40px;
+      }
+      .rate__list {
+        width: 60%;
+        display: grid;
+        justify-content: space-between;
+        grid-template-columns: repeat(auto-fill, 140px);
+        grid-gap: 8px;
+      }
+      .rate__item {
+        h4 {
+          font-size: 14px;
+          font-weight: 400;
+          line-height: 21px;
+          color: #64748b;
+          margin-bottom: 4px;
+        }
+        strong {
+          font-size: 16px;
+          font-weight: 700;
+          line-height: 24px;
+          color: #334155;
+        }
+      }
+    }
+  }
+  // 歷屆得票數
+  .history {
+    margin-bottom: 40px;
+    .history__row {
+      display: grid;
+      justify-content: space-between;
+      grid-template-columns: repeat(auto-fill, 49%);
+      grid-gap: 0px 12px;
+    }
+    .history__col {
+      padding: 24px 16px;
+      border-radius: 12px;
+      border: 1px solid #dee2e6;
+    }
+    .history__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+
+      h3 {
+        font-size: 20px;
+        font-weight: 700;
+        line-height: 30px;
+        color: #334155;
+      }
+    }
+    .header__list {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+    }
+    .header__item {
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 18px;
+      color: #334155;
+      margin-right: 4px;
+
+      span {
+        display: inline-block;
+        border-radius: 10px;
+        background: #8082ff;
+        width: 8px;
+        height: 8px;
+        margin-right: 4px;
+      }
+    }
+    .history__bar {
+      width: 100%;
+      height: 220px;
+      background: #ffff;
+      margin: 0 auto;
+
+      #barColum,
+      #barRate {
+        width: 100%;
+        height: 100%;
+      }
+    }
+  }
+  // 各縣市投票總覽
+  .overview {
+    h3 {
+      font-size: 20px;
+      font-weight: 700;
+      line-height: 30px;
+      margin-top: 8px;
+      margin-bottom: 16px;
+      color: #334155;
+    }
+    table {
+      font-family: "Oswald", sans-serif;
+      border-collapse: collapse;
+    }
+    th {
+      background-color: #E9ECEF;
+      color: #334155;
+      width: 12vw;
+      padding: 8px;
+      text-align: left;
+    }
+    td {
+      background-color: #ffffff;
+      width: 12vw;
+      padding: 12px 8px;
+      text-align: left;
+    }
+    tr {
+      border-bottom: 1px solid #dddddd;
+    }
+    tr:last-of-type {
+      border-bottom: 1px solid #dddddd;
     }
   }
 }

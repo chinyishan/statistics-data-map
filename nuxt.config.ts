@@ -23,9 +23,9 @@ export default defineNuxtConfig({
       viewport: "width=device-width, initial-scale=1",
       meta: [
         { name: "description", content: "統計數據地圖" },
-        { name: "format-detection", content: "台灣人口分佈" },
+        { name: "format-detection", content: "台灣統計" },
         { property: "og:title", content: "統計數據地圖" },
-        { property: "og:description", content: "台灣人口分佈" },
+        { property: "og:description", content: "台灣統計" },
       ],
     },
   },
