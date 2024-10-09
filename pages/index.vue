@@ -17,15 +17,23 @@
               v-model="params.year"
               @change="actionSearchYear"
             >
-              <option value="2024">2024</option>
-              <option value="2020">2020</option>
-              <option value="2016">2016</option>
-              <option value="2012">2012</option>
+              <option
+                v-for="(item, index) in options.year"
+                :key="index"
+                :value="item.key"
+              >
+                {{ item.label }}
+              </option>
             </select>
             <select name="county" id="county" v-model="params.county">
               <option value="all">all</option>
-              <option value="臺北市">臺北市</option>
-              <option value="新北市">新北市</option>
+              <option
+                v-for="(item, index) in options.county_town"
+                :key="index"
+                :value="item.key"
+              >
+                {{ item.label }}
+              </option>
             </select>
             <select name="town" id="town" v-model="params.town">
               <option value="all">all</option>
@@ -150,13 +158,10 @@
               </tr>
             </thead>
             <tbody>
-              <tr
-                v-for="(item, index) in voteInfo.year2024['2024'].county"
-                :key="index"
-              >
+              <tr v-for="(item, index) in voteInfo['2024'].county" :key="index">
                 <td>{{ index }}</td>
-                <td>{{ "得票率" }}</td>
-                <td>{{ "當選人" }}</td>
+                <td>{{ '得票率' }}</td>
+                <td>{{ '當選人' }}</td>
                 <td>{{ item.total }}</td>
                 <td>{{ item.rate }}</td>
                 <td>></td>
@@ -170,13 +175,14 @@
 </template>
 
 <script setup>
-import * as echarts from "echarts";
-import taiwanJSON from "@/assets/json/taiwan.json";
-import voteAllYear from "@/assets/json/vote-all-year.json";
-import vote2024 from "@/assets/json/vote-2024.json";
+import * as echarts from 'echarts';
+import taiwanJSON from '@/assets/json/taiwan.json';
+import voteAll from '@/assets/json/vote-all.json';
+import vote2024 from '@/assets/json/vote-2024.json';
+import resource from '@/assets/json/resource.json';
 
 onMounted(() => {
-  window.addEventListener("resize", function () {
+  window.addEventListener('resize', function () {
     taiwanChart.resize();
     barColumChart.resize();
     pieRateChart.resize();
@@ -186,42 +192,50 @@ onMounted(() => {
   drawpieRate();
 });
 
+/**選項 */
+const options = reactive({
+  county_town: resource.county_town,
+  year: resource.year,
+});
+
+console.log(options, 'options');
+
 const partInfo = reactive({
   民進黨: {
-    pic: "face-2",
-    color: "#91cc75",
+    pic: 'face-2',
+    color: '#91cc75',
   },
   國民黨: {
-    pic: "face-1",
-    color: "#5470c6",
+    pic: 'face-1',
+    color: '#5470c6',
   },
   無黨籍: {
-    pic: "face-5",
-    color: "#7e7e7e",
+    pic: 'face-5',
+    color: '#7e7e7e',
   },
   親民黨: {
-    pic: "face-4",
-    color: "#faa658",
+    pic: 'face-4',
+    color: '#faa658',
   },
   民眾黨: {
-    pic: "face-3",
-    color: "#4dc1bf",
+    pic: 'face-3',
+    color: '#4dc1bf',
   },
 });
 
 const params = reactive({
-  year: "2024",
-  county: "臺北市",
-  town: "松山區",
+  year: '2024',
+  county: '臺北市',
+  town: '松山區',
 });
 
 /**票數統計 */
 const voteInfo = reactive({
-  all: voteAllYear,
-  year2024: vote2024,
+  all: voteAll,
+  2024: vote2024,
 });
 
-console.log(voteInfo.year2024["2024"].county);
+console.log(voteInfo['2024'].county);
 
 const candidateData = computed(() => {
   const result = voteInfo.all || {};
@@ -235,44 +249,44 @@ const candidateData = computed(() => {
 });
 
 const countyRegions = reactive({
-  南投縣: { name: "南投縣", color: "#F8C471" },
-  臺中市: { name: "臺中市", color: "#85C1E9" },
-  臺北市: { name: "臺北市", color: "#FF6B6B" },
-  臺南市: { name: "臺南市", color: "#A3E4D7" },
-  臺東縣: { name: "臺東縣", color: "#AED6F1" },
-  嘉義市: { name: "嘉義市", color: "#FAD7A0" },
-  嘉義縣: { name: "嘉義縣", color: "#E59866" },
-  基隆市: { name: "基隆市", color: "#F1948A" },
-  宜蘭縣: { name: "宜蘭縣", color: "#98D8C8" },
-  屏東縣: { name: "屏東縣", color: "#D7BDE2" },
-  彰化縣: { name: "彰化縣", color: "#F1948A" },
-  新北市: { name: "新北市", color: "#45B7D1" },
-  新竹市: { name: "新竹市", color: "#BB8FCE" },
-  新竹縣: { name: "新竹縣", color: "#F7DC6F" },
-  桃園縣: { name: "桃園縣", color: "#FFA07A" },
-  澎湖縣: { name: "澎湖縣", color: "#A2D9CE" },
-  花蓮縣: { name: "花蓮縣", color: "#F9E79F" },
-  苗栗縣: { name: "苗栗縣", color: "#82E0AA" },
-  連江縣: { name: "連江縣", color: "#FADBD8" },
-  金門縣: { name: "金門縣", color: "#D2B4DE" },
-  雲林縣: { name: "雲林縣", color: "#73C6B6" },
-  高雄市: { name: "高雄市", color: "#F5B7B1" },
+  南投縣: { name: '南投縣', color: '#F8C471' },
+  臺中市: { name: '臺中市', color: '#85C1E9' },
+  臺北市: { name: '臺北市', color: '#FF6B6B' },
+  臺南市: { name: '臺南市', color: '#A3E4D7' },
+  臺東縣: { name: '臺東縣', color: '#AED6F1' },
+  嘉義市: { name: '嘉義市', color: '#FAD7A0' },
+  嘉義縣: { name: '嘉義縣', color: '#E59866' },
+  基隆市: { name: '基隆市', color: '#F1948A' },
+  宜蘭縣: { name: '宜蘭縣', color: '#98D8C8' },
+  屏東縣: { name: '屏東縣', color: '#D7BDE2' },
+  彰化縣: { name: '彰化縣', color: '#F1948A' },
+  新北市: { name: '新北市', color: '#45B7D1' },
+  新竹市: { name: '新竹市', color: '#BB8FCE' },
+  新竹縣: { name: '新竹縣', color: '#F7DC6F' },
+  桃園縣: { name: '桃園縣', color: '#FFA07A' },
+  澎湖縣: { name: '澎湖縣', color: '#A2D9CE' },
+  花蓮縣: { name: '花蓮縣', color: '#F9E79F' },
+  苗栗縣: { name: '苗栗縣', color: '#82E0AA' },
+  連江縣: { name: '連江縣', color: '#FADBD8' },
+  金門縣: { name: '金門縣', color: '#D2B4DE' },
+  雲林縣: { name: '雲林縣', color: '#73C6B6' },
+  高雄市: { name: '高雄市', color: '#F5B7B1' },
 });
 
-const taiwanMap = ref("");
+const taiwanMap = ref('');
 let taiwanChart = null;
 
 /**台灣地圖 */
 const drawTaiwan = async () => {
   taiwanChart = echarts.init(taiwanMap.value);
-  echarts.registerMap("taiwan", taiwanJSON); //注册可用的地图
+  echarts.registerMap('taiwan', taiwanJSON); //注册可用的地图
 
   const option = {
     // 數據系列
     series: [
       {
-        type: "map",
-        map: "taiwan",
+        type: 'map',
+        map: 'taiwan',
         geoIndex: 1,
         aspectScale: 1,
         roam: true,
@@ -294,20 +308,20 @@ const drawTaiwan = async () => {
           name: key,
           value: 0,
           itemStyle: {
-            areaColor: countyRegions[key].color || "#ffffff", //countyRegions[key].color
-            borderColor: "#aaaa",
+            areaColor: countyRegions[key].color || '#ffffff', //countyRegions[key].color
+            borderColor: '#aaaa',
             borderWidth: 1,
           },
         })),
       },
     ],
     nameMap: {
-      taiwan: "臺灣",
+      taiwan: '臺灣',
     },
     // 顯示資訊
     tooltip: {
-      trigger: "item",
-      formatter: "{b}",
+      trigger: 'item',
+      formatter: '{b}',
     },
   };
 
@@ -324,8 +338,8 @@ const changeCounty = (name) => {
             name: key,
             value: 0,
             itemStyle: {
-              areaColor: key === name ? countyRegions[key].color : "#ffffff", // 修改此行
-              borderColor: "#aaaa",
+              areaColor: key === name ? countyRegions[key].color : '#ffffff', // 修改此行
+              borderColor: '#aaaa',
               borderWidth: 1,
             },
           })),
@@ -335,38 +349,41 @@ const changeCounty = (name) => {
   }
 };
 
-const pieRate = ref("");
+/**圓餅圖參數 */
+const pieRate = ref('');
 let pieRateChart = null;
+
+/**圓餅圖繪製 */
 const drawpieRate = async () => {
   pieRateChart = echarts.init(pieRate.value);
 
   const option = {
     tooltip: {
-      trigger: "item",
+      trigger: 'item',
     },
     series: [
       {
-        name: "Access From",
-        type: "pie",
-        radius: ["40%", "70%"],
+        name: 'Access From',
+        type: 'pie',
+        radius: ['40%', '70%'],
         avoidLabelOverlap: false,
         label: {
           show: false,
-          position: "center",
+          position: 'center',
         },
         emphasis: {
           label: {
             show: true,
             fontSize: 40,
-            fontWeight: "bold",
+            fontWeight: 'bold',
           },
         },
         labelLine: {
           show: false,
         },
         data: [
-          { value: 1048, name: "Search Engine" },
-          { value: 735, name: "Direct" },
+          { value: 1048, name: 'Search Engine' },
+          { value: 735, name: 'Direct' },
         ],
       },
     ],
@@ -375,9 +392,11 @@ const drawpieRate = async () => {
   pieRateChart.setOption(option);
 };
 
-const barColum = ref("");
+/**柱狀圖參數 */
+const barColum = ref('');
 let barColumChart = null;
 
+/**柱狀圖繪製 */
 const drawBarColum = async () => {
   barColumChart = echarts.init(barColum.value);
 
@@ -403,12 +422,12 @@ const drawBarColum = async () => {
     const color =
       years
         .map((year) => candidateData.value[year].candidate[party]?.color)
-        .find((c) => c) || "#000000"; // 默認顏色為黑色
+        .find((c) => c) || '#000000'; // 默認顏色為黑色
 
     seriesData.push({
       name: party,
-      type: "bar",
-      barWidth: "10%",
+      type: 'bar',
+      barWidth: '10%',
       data: data,
       itemStyle: {
         color: color, // 設置顏色
@@ -423,21 +442,21 @@ const drawBarColum = async () => {
     // },
     // 顯示
     tooltip: {
-      trigger: "item",
-      formatter: "{b}: {c}", // 顯示政黨得票數
+      trigger: 'item',
+      formatter: '{b}: {c}', // 顯示政黨得票數
     },
     grid: {
-      top: "10%",
-      bottom: "10%",
-      left: "10%",
-      right: "2%",
+      top: '10%',
+      bottom: '10%',
+      left: '10%',
+      right: '2%',
     },
     xAxis: {
-      type: "category",
+      type: 'category',
       data: years, // X 軸顯示年份
     },
     yAxis: {
-      type: "value",
+      type: 'value',
       axisLabel: {
         formatter: (value) => `${value / 10000}萬`, // 添加单位“萬”
       },
@@ -545,13 +564,13 @@ const drawBarColum = async () => {
 
           &.elected {
             &::after {
-              content: "";
+              content: '';
               position: absolute;
               width: 24px;
               height: 24px;
               top: 20px;
               right: 20px;
-              background: no-repeat center url("@/assets/icon/elected.svg");
+              background: no-repeat center url('@/assets/icon/elected.svg');
             }
           }
         }
@@ -699,7 +718,7 @@ const drawBarColum = async () => {
       color: #334155;
     }
     table {
-      font-family: "Oswald", sans-serif;
+      font-family: 'Oswald', sans-serif;
       border-collapse: collapse;
     }
     th {
