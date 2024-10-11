@@ -26,7 +26,7 @@
               </option>
             </select>
             <select name="county" id="county" v-model="params.county">
-              <option value="all">all</option>
+              <option key="all" value="all" label="all">all</option>
               <option
                 v-for="(item, index) in options.county_town"
                 :key="index"
@@ -52,7 +52,7 @@
     </header>
     <div class="statistic">
       <div class="statistic__map">
-        <div id="taiwanMap" ref="taiwanMap"></div>
+        <!-- <div id="taiwanMap" ref="taiwanMap"></div> -->
       </div>
       <div class="statistic__main">
         <h2>全臺縣市總統得票</h2>
@@ -139,7 +139,7 @@
                 </ul>
               </div>
               <div class="history__bar">
-                <div id="barRate" ref="barRate"></div>
+                <div id="barLine" ref="barLine"></div>
               </div>
             </div>
           </div>
@@ -184,11 +184,13 @@ import resource from '@/assets/json/resource.json';
 onMounted(() => {
   window.addEventListener('resize', function () {
     taiwanChart.resize();
-    barColumChart.resize();
     pieRateChart.resize();
+    barColumChart.resize();
+    barLineChart.resize();
   });
   drawTaiwan();
   drawBarColum();
+  drawBarLine();
   drawpieRate();
 });
 
@@ -237,6 +239,7 @@ const voteInfo = reactive({
 
 console.log(voteInfo['2024'].county);
 
+/**候選人數據 */
 const candidateData = computed(() => {
   const result = voteInfo.all || {};
   Object.values(result).forEach((val) => {
@@ -273,10 +276,9 @@ const countyRegions = reactive({
   高雄市: { name: '高雄市', color: '#F5B7B1' },
 });
 
+/**台灣地圖 */
 const taiwanMap = ref('');
 let taiwanChart = null;
-
-/**台灣地圖 */
 const drawTaiwan = async () => {
   taiwanChart = echarts.init(taiwanMap.value);
   echarts.registerMap('taiwan', taiwanJSON); //注册可用的地图
@@ -328,32 +330,30 @@ const drawTaiwan = async () => {
   taiwanChart.setOption(option);
 };
 
-const changeCounty = (name) => {
-  const selectedRegion = Object.keys(countyRegions).find((key) => key === name);
-  if (selectedRegion) {
-    taiwanChart.setOption({
-      series: [
-        {
-          data: Object.keys(countyRegions).map((key) => ({
-            name: key,
-            value: 0,
-            itemStyle: {
-              areaColor: key === name ? countyRegions[key].color : '#ffffff', // 修改此行
-              borderColor: '#aaaa',
-              borderWidth: 1,
-            },
-          })),
-        },
-      ],
-    });
-  }
-};
+// const changeCounty = (name) => {
+//   const selectedRegion = Object.keys(countyRegions).find((key) => key === name);
+//   if (selectedRegion) {
+//     taiwanChart.setOption({
+//       series: [
+//         {
+//           data: Object.keys(countyRegions).map((key) => ({
+//             name: key,
+//             value: 0,
+//             itemStyle: {
+//               areaColor: key === name ? countyRegions[key].color : '#ffffff', // 修改此行
+//               borderColor: '#aaaa',
+//               borderWidth: 1,
+//             },
+//           })),
+//         },
+//       ],
+//     });
+//   }
+// };
 
-/**圓餅圖參數 */
+/**圓餅圖 */
 const pieRate = ref('');
 let pieRateChart = null;
-
-/**圓餅圖繪製 */
 const drawpieRate = async () => {
   pieRateChart = echarts.init(pieRate.value);
 
@@ -392,11 +392,9 @@ const drawpieRate = async () => {
   pieRateChart.setOption(option);
 };
 
-/**柱狀圖參數 */
+/**柱狀圖 */
 const barColum = ref('');
 let barColumChart = null;
-
-/**柱狀圖繪製 */
 const drawBarColum = async () => {
   barColumChart = echarts.init(barColum.value);
 
@@ -465,6 +463,68 @@ const drawBarColum = async () => {
   };
 
   barColumChart.setOption(option);
+};
+
+/**折線圖 */
+const barLine = ref('');
+let barLineChart = null;
+const drawBarLine = async () => {
+  barLineChart = echarts.init(barLine.value);
+
+  const years = Object.keys(candidateData.value);
+
+  const option = {
+    legend: {
+      data: ['Email', 'Union Ads', 'Video Ads', 'Direct', 'Search Engine'],
+    },
+    grid: {
+      left: '3%',
+      right: '4%',
+      bottom: '3%',
+      containLabel: true,
+    },
+    toolbox: {
+      feature: {
+        saveAsImage: {},
+      },
+    },
+    xAxis: {
+      type: 'category',
+      boundaryGap: false,
+      data: years,
+    },
+    yAxis: {
+      type: 'value',
+    },
+    series: [
+      {
+        name: 'Email',
+        type: 'line',
+        stack: 'Total',
+        data: [120, 132, 101, 134, 90, 230, 210],
+      },
+      {
+        name: 'Union Ads',
+        type: 'line',
+        stack: 'Total',
+        data: [220, 182, 191, 234, 290, 330, 310],
+      },
+      {
+        name: 'Video Ads',
+        type: 'line',
+        stack: 'Total',
+        data: [150, 232, 201, 154, 190, 330, 410],
+      },
+      {
+        name: 'Direct',
+        type: 'line',
+        stack: 'Total',
+        data: [320, 332, 301, 334, 390, 330, 320],
+      },
+    ],
+  };
+
+  barLineChart.setOption(option);
 };
 </script>
 <style lang="scss">
@@ -701,7 +761,7 @@ const drawBarColum = async () => {
       margin: 0 auto;
 
       #barColum,
-      #barRate {
+      #barLine {
         width: 100%;
         height: 100%;
       }
