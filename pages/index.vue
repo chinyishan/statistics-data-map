@@ -15,7 +15,7 @@
               name="year"
               id="year"
               v-model="params.year"
-              @change="actionSearchYear"
+              @change="changeSearchYear"
             >
               <option
                 v-for="(item, index) in options.year"
@@ -25,7 +25,12 @@
                 {{ item.label }}
               </option>
             </select>
-            <select name="county" id="county" v-model="params.county">
+            <select
+              name="county"
+              id="county"
+              v-model="params.county"
+              @change="changeSearchCounty"
+            >
               <option key="all" value="all" label="all">all</option>
               <option
                 v-for="(item, index) in options.county_town"
@@ -255,6 +260,7 @@ onMounted(() => {
     barLineChart.resize();
   });
 });
+
 const img = useGlobImg();
 
 /**選項 */
@@ -285,8 +291,26 @@ const voteInfo = reactive({
   2020: vote2020,
 });
 
+const changeSearchYear = () => {
+  params.county = 'all';
+  params.town = 'all';
+};
+
+const changeSearchCounty = () => {
+  params.town = 'all';
+};
+
+/**票數清單 */
 const voteList = computed(() => {
-  const result = voteInfo[params.year].county || [];
+  const result = voteInfo[params.year].county || {};
+
+  if (params.county !== 'all' && params.town == 'all') {
+    return result[params.county]?.towns || {};
+  }
+
+  if (params.county !== 'all' && params.town !== 'all') {
+    return result[params.county].towns[params.town]?.village || {};
+  }
 
   return result;
 });
@@ -315,46 +339,47 @@ const partyInfo = reactive({
   },
 });
 
+/**處理顏色 */
 const hanleColor = (party) => {
   return partyInfo[party].color;
 };
 
-const hanleName = (county) => {
-  const all = voteInfo['all'][params.year].candidate || {};
-  const year = voteInfo[params.year] || {};
-  const candData = year.county[county]?.candidate || {}; // 使用可选链避免错误
+/**處理姓名圖片 */
+const hanleName = (countyTown) => {
+  const all = yearsCandidateData.value[params.year].candidate || {};
+  const candData = voteList.value[countyTown]?.candidate || {}; // 使用可选链避免错误
 
   let highestParty = null;
   let highestTotal = 0;
 
-  // 遍历候选人数据，找到票数最高的政党
+  // 遍歷候選人數據，找到票數最高的政黨
   Object.entries(candData).forEach(([party, data]) => {
     if (data.total > highestTotal) {
       highestTotal = data.total;
-      highestParty = party; // 保存最高票数的政党
+      highestParty = party; // 保存最高票数的政黨
     }
   });
 
-  // 根据最高票数的政党从 all 数据中提取相应的信息
+  // 根据最高票数的政黨 all 數據中提取相应的信息
   const highestCandidate = all[highestParty] || {
     name: '未知',
-    pic: 'default-pic',
+    pic: 'face-none',
   };
-
-  // console.log(highestCandidate, 'highestCandidate');
 
   return highestCandidate; // 返回最高票数的候选人信息
 };
 
-/**年度候選人數據 */
+/**年度候選人處理圖顏色 */
 const yearsCandidateData = computed(() => {
   const result = voteInfo.all || {};
+
   Object.values(result).forEach((val) => {
     Object.keys(val.candidate).forEach((c) => {
       val.candidate[c].pic = partyInfo[c]?.pic;
       val.candidate[c].color = partyInfo[c]?.color;
     });
   });
+
   return result;
 });
 
@@ -363,9 +388,7 @@ const taiwanMap = ref('');
 let taiwanChart = null;
 const drawTaiwan = async () => {
   taiwanChart = echarts.init(taiwanMap.value);
-  echarts.registerMap('taiwan', taiwanJSON); //注册可用的地图
-
-  console.log(Object.keys(voteList.value), 'hanleName(index).color');
+  echarts.registerMap('taiwan', taiwanJSON); //註冊可用的地圖
 
   const option = {
     // 數據系列
@@ -983,10 +1006,10 @@ const drawBarLine = async () => {
     .overview__pic {
       box-sizing: border-box;
       width: 24px;
-      // height: 24px;
+      height: 24px;
       padding: 4px;
       border-radius: 50%;
-      background: #8082ff;
+      background: #aaaa;
       margin-right: 8px;
     }
   }
