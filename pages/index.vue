@@ -29,7 +29,7 @@
               name="county"
               id="county"
               v-model="params.county"
-              @change="changeSearchCounty"
+              @change="changeSearchCounty()"
             >
               <option key="all" value="all" label="all">all</option>
               <option
@@ -65,6 +65,16 @@
     <div class="statistic">
       <div class="statistic__map">
         <div id="taiwanMap" ref="taiwanMap"></div>
+        <ul class="cand__list">
+          <li
+            class="cand__item"
+            v-for="(item, index) in yearsCandidateData[params.year].candidate"
+            :key="index"
+          >
+            <span :style="{ background: item.color }"></span>
+            <p>{{ index }}</p>
+          </li>
+        </ul>
       </div>
       <div class="statistic__main">
         <h2>全臺縣市總統得票</h2>
@@ -182,7 +192,7 @@
           <table>
             <thead>
               <tr>
-                <th style="width: 16%">縣市</th>
+                <th style="width: auto">縣市</th>
                 <th style="width: auto">得票率</th>
                 <th style="width: 16%">當選人</th>
                 <th style="width: 16%">投票數</th>
@@ -191,7 +201,15 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(item, index) in voteList" :key="index">
+              <tr
+                v-for="(item, index) in voteList"
+                :key="index"
+                @click="
+                  params.county == 'all' || params.town == 'all'
+                    ? changeList(index)
+                    : null
+                "
+              >
                 <td>
                   <h4>{{ index }}</h4>
                 </td>
@@ -229,7 +247,13 @@
                   <p>{{ item.rate }}</p>
                 </td>
                 <td>
-                  <img src="@/assets/icon/arrow-right.svg" alt="arrow-right" />
+                  <img
+                    class="arrow"
+                    v-if="params.county == 'all' || params.town == 'all'"
+                    src="@/assets/icon/arrow-right.svg"
+                    alt="arrow-right"
+                  />
+                  <div class="arrow" v-else></div>
                 </td>
               </tr>
             </tbody>
@@ -291,23 +315,36 @@ const voteInfo = reactive({
   2020: vote2020,
 });
 
+/**變更年分 */
 const changeSearchYear = () => {
   params.county = 'all';
   params.town = 'all';
+  drawTaiwan();
 };
 
+/**變更縣市 */
 const changeSearchCounty = () => {
   params.town = 'all';
+};
+
+const changeList = (key) => {
+  if (params.county == 'all' && params.town == 'all') {
+    params.county = key; // 更新縣市
+    params.town = 'all';
+  } else {
+    params.town = key; // 更新區域
+  }
 };
 
 /**票數清單 */
 const voteList = computed(() => {
   const result = voteInfo[params.year].county || {};
 
+  // 縣市
   if (params.county !== 'all' && params.town == 'all') {
     return result[params.county]?.towns || {};
   }
-
+  // 地區
   if (params.county !== 'all' && params.town !== 'all') {
     return result[params.county].towns[params.town]?.village || {};
   }
@@ -383,6 +420,31 @@ const yearsCandidateData = computed(() => {
   return result;
 });
 
+const cityCoords = {
+  新北市: [121.6739, 24.91571],
+  高雄市: [120.666, 23.01087],
+  臺中市: [120.9417, 24.23321],
+  臺北市: [121.5598, 25.09108],
+  桃園市: [121.2168, 24.93759],
+  臺南市: [120.2513, 23.1417],
+  彰化縣: [120.4818, 23.99297],
+  屏東縣: [120.62, 22.54951],
+  雲林縣: [120.3897, 23.75585],
+  苗栗縣: [120.9417, 24.48927],
+  嘉義縣: [120.574, 23.45889],
+  新竹縣: [121.1252, 24.70328],
+  南投縣: [120.9876, 23.83876],
+  宜蘭縣: [121.7195, 24.69295],
+  新竹市: [120.9647, 24.80395],
+  基隆市: [121.7081, 25.10898],
+  花蓮縣: [121.3542, 23.7569],
+  嘉義市: [120.4473, 23.47545],
+  臺東縣: [120.9876, 22.98461],
+  金門縣: [119.6186, 24.43679],
+  澎湖縣: [119.6151, 23.56548],
+  連江縣: [119.9397, 25.19737],
+};
+
 /**台灣地圖 */
 const taiwanMap = ref('');
 let taiwanChart = null;
@@ -399,19 +461,31 @@ const drawTaiwan = async () => {
         geoIndex: 1,
         aspectScale: 1,
         roam: true,
-        zoom: 1.15,
+        zoom: 1.2,
         scaleLimit: {
-          min: 1.15,
+          min: 1.2,
           max: 3,
         },
-        center: [120.6, 23.7],
+        center: [120.7, 23.7],
         // 高亮
-        emphasis: {
-          disabled: true, // 禁用
-        },
+        emphasis: Object.keys(voteList.value).map((key) => ({
+          itemStyle: {
+            color: hanleName(key).color || '#ffff',
+          },
+        })),
         // 選中
         select: {
           disabled: true, // 禁用
+        },
+        label: {
+          show: true,
+          formatter: '{b}',
+          color: '#fff',
+          textBorderColor: '#000',
+          textBorderWidth: 2,
+          fontSize: 12,
+          fontWeight: 'bold',
+          fontFamily: 'sans-serif',
         },
         data: Object.keys(voteList.value).map((key) => ({
           name: key,
@@ -435,28 +509,22 @@ const drawTaiwan = async () => {
   };
 
   taiwanChart.setOption(option);
-};
 
-// const changeCounty = (name) => {
-//   const selectedRegion = Object.keys(countyRegions).find((key) => key === name);
-//   if (selectedRegion) {
-//     taiwanChart.setOption({
-//       series: [
-//         {
-//           data: Object.keys(countyRegions).map((key) => ({
-//             name: key,
-//             value: 0,
-//             itemStyle: {
-//               areaColor: key === name ? countyRegions[key].color : '#ffffff', // 修改此行
-//               borderColor: '#aaaa',
-//               borderWidth: 1,
-//             },
-//           })),
-//         },
-//       ],
-//     });
-//   }
-// };
+  taiwanChart.on('click', function (p) {
+    const coords = cityCoords[p.name]; // 獲取對應的坐標
+    params.county = p.name;
+    params.town = 'all';
+
+    taiwanChart.setOption({
+      series: [
+        {
+          zoom: 3,
+          center: coords,
+        },
+      ],
+    });
+  });
+};
 
 /**圓餅圖 */
 const pieRate = ref('');
@@ -644,17 +712,11 @@ const drawBarLine = async () => {
 };
 </script>
 <style lang="scss">
-.header {
-  .select__group {
-    select {
-      width: 100px;
-    }
-  }
-}
 .statistic {
   display: flex;
 
   .statistic__map {
+    position: relative;
     // width: 500px;
     width: 30%;
     height: calc(100vh - 60px);
@@ -666,6 +728,36 @@ const drawBarLine = async () => {
       width: 100%;
       height: 100%;
       background: #e4faff;
+    }
+    .cand__list {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      display: flex;
+      gap: 6px;
+      background: #fff;
+      border-radius: 50px;
+      padding: 4px 10px;
+    }
+    .cand__item {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 4px;
+
+      span {
+        display: block;
+        width: 7px;
+        height: 7px;
+        border-radius: 50px;
+        background: #aaa;
+      }
+      p {
+        font-size: 10px;
+        font-weight: 400;
+        line-height: 14px;
+        text-align: right;
+      }
     }
   }
   .statistic__main {
@@ -806,6 +898,7 @@ const drawBarLine = async () => {
       flex-wrap: wrap;
       gap: 20px;
       padding: 18px 24px;
+      // flex-grow: 1;
       // margin-left: 16px;
 
       .rate__graph {
@@ -968,7 +1061,7 @@ const drawBarLine = async () => {
       &:last-child {
         text-align: center;
 
-        img {
+        .arrow {
           width: 10px;
           height: 10px;
         }
@@ -1013,5 +1106,24 @@ const drawBarLine = async () => {
       margin-right: 8px;
     }
   }
+}
+
+@media only screen and (max-width: 1024px) {
+  .statistic {
+    flex-wrap: wrap;
+
+    .statistic__map {
+      width: 100%;
+      position: relative;
+      top: 0px;
+      height: 300px;
+    }
+    .statistic__main {
+      width: 100%;
+    }
+  }
+}
+
+@media only screen and (max-width: 768px) {
 }
 </style>
