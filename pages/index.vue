@@ -2,57 +2,62 @@
   <div class="app-container">
     <header class="header">
       <div class="header__main">
-        <div class="header__logoWrap">
-          <div class="header__logo">
+        <div class="header__logo">
+          <div class="logo__pic">
             <img src="@/assets/icon/logo.svg" alt="logo" />
           </div>
-          <h1 class="header__title">台灣歷年總統 都幾?</h1>
+          <h1 class="logo__title">台灣歷年總統 都幾?</h1>
+          <p class="logo__text">選擇年份</p>
+          <select
+            class="select__year"
+            name="year"
+            id="year"
+            v-model="params.year"
+            @change="changeSearchYear"
+          >
+            <option
+              v-for="(item, index) in options.year"
+              :key="index"
+              :value="item.key"
+            >
+              {{ item.label }}
+            </option>
+          </select>
         </div>
         <div class="header__select">
-          <p>選擇年份</p>
-          <div class="select__group">
-            <select
-              name="year"
-              id="year"
-              v-model="params.year"
-              @change="changeSearchYear"
+          <select
+            class="select__county"
+            name="county"
+            id="county"
+            v-model="params.county"
+            @change="changeSearchCounty()"
+          >
+            <option key="all" value="all" label="all">all</option>
+            <option
+              v-for="(item, index) in options.county_town"
+              :key="index"
+              :value="item.label"
+              :label="item.label"
             >
-              <option
-                v-for="(item, index) in options.year"
-                :key="index"
-                :value="item.key"
-              >
-                {{ item.label }}
-              </option>
-            </select>
-            <select
-              name="county"
-              id="county"
-              v-model="params.county"
-              @change="changeSearchCounty()"
+              {{ item.label }}
+            </option>
+          </select>
+          <select
+            class="select__town"
+            name="town"
+            id="town"
+            v-model="params.town"
+          >
+            <option value="all">all</option>
+            <option
+              v-for="(item, index) in optionsTowns"
+              :key="index"
+              :value="item.label"
+              :label="item.label"
             >
-              <option key="all" value="all" label="all">all</option>
-              <option
-                v-for="(item, index) in options.county_town"
-                :key="index"
-                :value="item.label"
-                :label="item.label"
-              >
-                {{ item.label }}
-              </option>
-            </select>
-            <select name="town" id="town" v-model="params.town">
-              <option value="all">all</option>
-              <option
-                v-for="(item, index) in optionsTowns"
-                :key="index"
-                :value="item.label"
-                :label="item.label"
-              >
-                {{ item.label }}
-              </option>
-            </select>
-          </div>
+              {{ item.label }}
+            </option>
+          </select>
         </div>
       </div>
       <div class="header__link">
@@ -77,188 +82,195 @@
         </ul>
       </div>
       <div class="statistic__main">
-        <h2>全臺縣市總統得票</h2>
-        <section class="president">
-          <h3>總統得票數</h3>
-          <div class="president__row">
-            <div class="president__col club">
-              <ul class="club__list">
-                <li
-                  class="club__item"
-                  v-for="(item, index) in yearsCandidateData[params.year]
-                    .candidate"
-                  :key="index"
-                >
-                  <div class="club__pic" :style="{ background: item.color }">
-                    <img :src="img.imagesSvg[item.pic]" alt="face" />
-                  </div>
-                  <div class="club__text">
-                    <h4>{{ index }}</h4>
-                    <h5>{{ item.name }}</h5>
-                    <p>
-                      <strong>{{ item.total.toLocaleString() }}</strong
-                      >票
-                    </p>
-                  </div>
-                </li>
-              </ul>
-              <div class="club__percent">
-                <div
-                  class="club__line"
-                  v-for="(item, index) in yearsCandidateData[params.year]
-                    .candidate"
-                  :key="index"
-                  :style="{ background: item.color, width: `${item.rate}%` }"
-                >
-                  <span>{{ item.rate }}%</span>
-                </div>
-              </div>
-            </div>
-            <div class="president__col rate">
-              <div class="rate__graph">
-                <div id="pieRate" ref="pieRate"></div>
-                <div class="rate__sub">
-                  <small>投票率</small>
-                  <strong>{{ yearsCandidateData[params.year].rate }}%</strong>
-                </div>
-              </div>
-              <ul class="rate__list">
-                <li class="rate__item">
-                  <h4>投票數</h4>
-                  <strong>{{
-                    yearsCandidateData[params.year].total.toLocaleString()
-                  }}</strong>
-                </li>
-                <li class="rate__item">
-                  <h4>投票率</h4>
-                  <strong>{{ yearsCandidateData[params.year].rate }} %</strong>
-                </li>
-                <li class="rate__item">
-                  <h4>有效票數</h4>
-                  <strong>{{
-                    yearsCandidateData[params.year].valid.toLocaleString()
-                  }}</strong>
-                </li>
-                <li class="rate__item">
-                  <h4>無效票數</h4>
-                  <strong>{{
-                    yearsCandidateData[params.year].invalid.toLocaleString()
-                  }}</strong>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </section>
-        <section class="history">
-          <div class="history__row">
-            <div class="history__col">
-              <div class="history__header">
-                <h3>歷屆政黨得票數</h3>
-                <ul class="header__list">
+        <div class="statistic__wrap">
+          <h2>全臺縣市總統得票</h2>
+          <section class="president">
+            <h3>總統得票數</h3>
+            <div class="president__row">
+              <div class="president__col club">
+                <ul class="club__list">
                   <li
-                    class="header__item"
-                    v-for="(item, index) in partyInfo"
+                    class="club__item"
+                    v-for="(item, index) in yearsCandidateData[params.year]
+                      .candidate"
                     :key="index"
                   >
-                    <span :style="{ background: item.color }"></span>{{ index }}
-                  </li>
-                </ul>
-              </div>
-              <div class="history__bar">
-                <div id="barColum" ref="barColum"></div>
-              </div>
-            </div>
-            <div class="history__col">
-              <div class="history__header">
-                <h3>歷屆政黨得票率</h3>
-                <ul class="header__list">
-                  <li
-                    class="header__item"
-                    v-for="(item, index) in partyInfo"
-                    :key="index"
-                  >
-                    <span :style="{ background: item.color }"></span>{{ index }}
-                  </li>
-                </ul>
-              </div>
-              <div class="history__bar">
-                <div id="barLine" ref="barLine"></div>
-              </div>
-            </div>
-          </div>
-        </section>
-        <section class="overview">
-          <h3>各縣市投票總覽</h3>
-          <table>
-            <thead>
-              <tr>
-                <th style="width: auto">縣市</th>
-                <th style="width: auto">得票率</th>
-                <th style="width: 16%">當選人</th>
-                <th style="width: 16%">投票數</th>
-                <th style="width: 16%">投票率</th>
-                <th style="width: 4%"></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr
-                v-for="(item, index) in voteList"
-                :key="index"
-                @click="
-                  params.county == 'all' || params.town == 'all'
-                    ? changeList(index)
-                    : null
-                "
-              >
-                <td>
-                  <h4>{{ index }}</h4>
-                </td>
-                <td>
-                  <div class="overview__percent">
-                    <div
-                      class="overview__line"
-                      v-for="(c, x) in item.candidate"
-                      :key="x"
-                      :style="{
-                        background: hanleColor(x),
-                        width: `${c.rate}%`,
-                      }"
-                    ></div>
-                  </div>
-                </td>
-                <td>
-                  <div class="overview__peopel">
-                    <div
-                      class="overview__pic"
-                      :style="{ background: hanleName(index).color }"
-                    >
-                      <img
-                        :src="img.imagesSvg[hanleName(index).pic]"
-                        alt="face"
-                      />
+                    <div class="club__pic" :style="{ background: item.color }">
+                      <img :src="img.imagesSvg[item.pic]" alt="face" />
                     </div>
-                    <p>{{ hanleName(index).name }}</p>
+                    <div class="club__text">
+                      <h4>{{ index }}</h4>
+                      <h5>{{ item.name }}</h5>
+                      <p>
+                        <strong>{{ item.total.toLocaleString() }}</strong
+                        >票
+                      </p>
+                    </div>
+                  </li>
+                </ul>
+                <div class="club__percent">
+                  <div
+                    class="club__line"
+                    v-for="(item, index) in yearsCandidateData[params.year]
+                      .candidate"
+                    :key="index"
+                    :style="{ background: item.color, width: `${item.rate}%` }"
+                  >
+                    <span>{{ item.rate }}%</span>
                   </div>
-                </td>
-                <td>
-                  <p>{{ item.total.toLocaleString() }}</p>
-                </td>
-                <td>
-                  <p>{{ item.rate }}</p>
-                </td>
-                <td>
-                  <img
-                    class="arrow"
-                    v-if="params.county == 'all' || params.town == 'all'"
-                    src="@/assets/icon/arrow-right.svg"
-                    alt="arrow-right"
-                  />
-                  <div class="arrow" v-else></div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </section>
+                </div>
+              </div>
+              <div class="president__col rate">
+                <div class="rate__graph">
+                  <div id="pieRate" ref="pieRate"></div>
+                  <div class="rate__sub">
+                    <small>投票率</small>
+                    <strong>{{ yearsCandidateData[params.year].rate }}%</strong>
+                  </div>
+                </div>
+                <ul class="rate__list">
+                  <li class="rate__item">
+                    <h4>投票數</h4>
+                    <strong>{{
+                      yearsCandidateData[params.year].total.toLocaleString()
+                    }}</strong>
+                  </li>
+                  <li class="rate__item">
+                    <h4>投票率</h4>
+                    <strong
+                      >{{ yearsCandidateData[params.year].rate }} %</strong
+                    >
+                  </li>
+                  <li class="rate__item">
+                    <h4>有效票數</h4>
+                    <strong>{{
+                      yearsCandidateData[params.year].valid.toLocaleString()
+                    }}</strong>
+                  </li>
+                  <li class="rate__item">
+                    <h4>無效票數</h4>
+                    <strong>{{
+                      yearsCandidateData[params.year].invalid.toLocaleString()
+                    }}</strong>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </section>
+          <section class="history">
+            <div class="history__row">
+              <div class="history__col">
+                <div class="history__header">
+                  <h3>歷屆政黨得票數</h3>
+                  <ul class="header__list">
+                    <li
+                      class="header__item"
+                      v-for="(item, index) in partyInfo"
+                      :key="index"
+                    >
+                      <span :style="{ background: item.color }"></span
+                      >{{ index }}
+                    </li>
+                  </ul>
+                </div>
+                <div class="history__bar">
+                  <div id="barColum" ref="barColum"></div>
+                </div>
+              </div>
+              <div class="history__col">
+                <div class="history__header">
+                  <h3>歷屆政黨得票率</h3>
+                  <ul class="header__list">
+                    <li
+                      class="header__item"
+                      v-for="(item, index) in partyInfo"
+                      :key="index"
+                    >
+                      <span :style="{ background: item.color }"></span
+                      >{{ index }}
+                    </li>
+                  </ul>
+                </div>
+                <div class="history__bar">
+                  <div id="barLine" ref="barLine"></div>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section class="overview">
+            <h3>各縣市投票總覽</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th style="width: auto">地區</th>
+                  <th style="width: auto">得票率</th>
+                  <th style="width: 16%">當選人</th>
+                  <th style="width: 16%">投票數</th>
+                  <th style="width: 16%">投票率</th>
+                  <th style="width: 4%"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="(item, index) in voteList"
+                  :key="index"
+                  @click="
+                    params.county == 'all' || params.town == 'all'
+                      ? changeList(index)
+                      : null
+                  "
+                >
+                  <td>
+                    <h4>{{ index }}</h4>
+                  </td>
+                  <td>
+                    <div class="overview__percent">
+                      <div
+                        class="overview__line"
+                        v-for="(c, x) in item.candidate"
+                        :key="x"
+                        :style="{
+                          background: hanleColor(x),
+                          width: `${c.rate}%`,
+                        }"
+                      ></div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="overview__peopel">
+                      <div
+                        class="overview__pic"
+                        :style="{ background: hanleName(index).color }"
+                      >
+                        <img
+                          :src="img.imagesSvg[hanleName(index).pic]"
+                          alt="face"
+                        />
+                      </div>
+                      <p>{{ hanleName(index).name }}</p>
+                    </div>
+                  </td>
+                  <td>
+                    <p>{{ item.total.toLocaleString() }}</p>
+                  </td>
+                  <td>
+                    <p>{{ item.rate }}</p>
+                  </td>
+                  <td>
+                    <img
+                      class="arrow"
+                      v-if="params.county == 'all' || params.town == 'all'"
+                      src="@/assets/icon/arrow-right.svg"
+                      alt="arrow-right"
+                    />
+                    <div class="arrow" v-else></div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+        </div>
+        <footer class="footer">版權所有 ©2023 台灣歷年總統 都幾?</footer>
       </div>
     </div>
   </div>
@@ -717,7 +729,6 @@ const drawBarLine = async () => {
 
   .statistic__map {
     position: relative;
-    // width: 500px;
     width: 30%;
     height: calc(100vh - 60px);
     position: sticky;
@@ -761,9 +772,10 @@ const drawBarLine = async () => {
     }
   }
   .statistic__main {
-    // width: calc(100% - 500px);
     width: 70%;
     box-sizing: border-box;
+  }
+  .statistic__wrap {
     padding: 32px 48px;
 
     h2 {
@@ -793,16 +805,15 @@ const drawBarLine = async () => {
     .president__row {
       display: flex;
       gap: 16px;
-      // flex-wrap: wrap;
+      flex-wrap: wrap;
     }
     .president__col {
-      width: 48%;
       background: #ffffff;
       border-radius: 12px;
     }
     .club {
       padding: 30px 24px;
-      // flex-grow: 1;
+      flex-grow: 1;
 
       .club__list {
         display: flex;
@@ -811,11 +822,8 @@ const drawBarLine = async () => {
         margin-bottom: 12px;
       }
       .club__item {
-        // display: flex;
-        // justify-content: flex-start;
-        // align-items: start;
         display: flex;
-        // flex-grow: 1;
+        flex-grow: 1;
         gap: 12px;
       }
       .club__pic {
@@ -825,7 +833,6 @@ const drawBarLine = async () => {
         border-radius: 16px;
         background: #7e7e7e;
         padding: 10px;
-        // margin-right: 12px;
       }
       .club__text {
         position: relative;
@@ -857,7 +864,6 @@ const drawBarLine = async () => {
           margin-bottom: 2px;
         }
         p {
-          // font-size: 16px;
           font-size: clamp(14px, 0.8vw, 16px);
           font-weight: 400;
           line-height: 24px;
@@ -890,22 +896,18 @@ const drawBarLine = async () => {
       }
     }
     .rate {
-      // display: flex;
-      // justify-content: flex-start;
-      // align-items: center;
       display: flex;
       justify-content: center;
       flex-wrap: wrap;
       gap: 20px;
       padding: 18px 24px;
-      // flex-grow: 1;
-      // margin-left: 16px;
+      flex-grow: 1;
 
       .rate__graph {
         position: relative;
         width: 124px;
         height: 124px;
-        // margin-right: 40px;
+
         .rate__sub {
           position: absolute;
           top: 50%;
@@ -935,10 +937,8 @@ const drawBarLine = async () => {
         }
       }
       .rate__list {
-        width: 60%;
         display: grid;
         grid-template-columns: 1fr 1fr;
-        // grid-template-columns: repeat(auto-fill, 40%);
         grid-gap: 8px;
         flex-grow: 1;
       }
@@ -962,16 +962,17 @@ const drawBarLine = async () => {
   // 歷屆得票數
   .history {
     margin-bottom: 40px;
+
     .history__row {
       display: grid;
-      justify-content: space-between;
-      grid-template-columns: repeat(auto-fill, 49%);
-      grid-gap: 0px 12px;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
     }
     .history__col {
       padding: 24px 16px;
       border-radius: 12px;
       border: 1px solid #dee2e6;
+      flex-grow: 1;
     }
     .history__header {
       display: flex;
@@ -1038,12 +1039,12 @@ const drawBarLine = async () => {
       background-color: #e9ecef;
       color: #334155;
       width: 12vw;
-      padding: 12px 14px;
+      padding: 12px 8px;
       text-align: left;
     }
     td {
       width: 12vw;
-      padding: 8px 14px;
+      padding: 8px;
       font-size: 14px;
       font-weight: 400;
       line-height: 24px;
@@ -1098,6 +1099,7 @@ const drawBarLine = async () => {
     }
     .overview__pic {
       box-sizing: border-box;
+      display: inline-block;
       width: 24px;
       height: 24px;
       padding: 4px;
@@ -1107,19 +1109,40 @@ const drawBarLine = async () => {
     }
   }
 }
+.footer {
+  background: #e9ecef;
+  padding: 16px 0;
+  text-align: center;
+}
 
-@media only screen and (max-width: 1024px) {
+@media only screen and (max-width: 1440px) {
+  .statistic {
+    flex-wrap: wrap;
+
+    .history {
+      .history__row {
+        display: flex;
+        flex-wrap: wrap;
+      }
+    }
+  }
+}
+
+@media only screen and (max-width: 1200px) {
   .statistic {
     flex-wrap: wrap;
 
     .statistic__map {
-      width: 100%;
       position: relative;
+      width: 100%;
+      height: 400px;
       top: 0px;
-      height: 300px;
     }
     .statistic__main {
       width: 100%;
+    }
+    .statistic__wrap {
+      padding: 32px 16px;
     }
   }
 }

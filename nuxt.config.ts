@@ -1,12 +1,12 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  compatibilityDate: "2024-04-03",
+  compatibilityDate: '2024-04-03',
   devtools: { enabled: true },
   devServer: {
-    host: "0.0.0.0", // default: localhost
-    port: 2222,
+    host: 'localhost', // default: localhost
+    port: 2345,
   },
-  css: ["@/assets/scss/style.scss"],
+  css: ['@/assets/scss/style.scss'],
   vite: {
     css: {
       preprocessorOptions: {
@@ -18,14 +18,14 @@ export default defineNuxtConfig({
   },
   app: {
     head: {
-      title: "統計數據地圖",
-      charset: "utf-8",
-      viewport: "width=device-width, initial-scale=1",
+      title: '統計數據地圖',
+      charset: 'utf-8',
+      viewport: 'width=device-width, initial-scale=1',
       meta: [
-        { name: "description", content: "統計數據地圖" },
-        { name: "format-detection", content: "台灣統計" },
-        { property: "og:title", content: "統計數據地圖" },
-        { property: "og:description", content: "台灣統計" },
+        { name: 'description', content: '統計數據地圖' },
+        { name: 'format-detection', content: '台灣統計' },
+        { property: 'og:title', content: '統計數據地圖' },
+        { property: 'og:description', content: '台灣統計' },
       ],
     },
   },
