@@ -26,6 +26,14 @@ export default defineNuxtConfig({
         { name: 'format-detection', content: '台灣歷年總統票數統計' },
         { property: 'og:title', content: '台灣歷年總統 都幾?' },
         { property: 'og:description', content: '台灣歷年總統票數統計' },
+        { property: 'og:image', content: '/web.jpg' },
+      ],
+      link: [
+        {
+          rel: 'Shortcut Icon',
+          type: 'image/x-icon',
+          href: '/favicon.ico',
+        },
       ],
     },
   },
