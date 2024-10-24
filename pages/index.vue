@@ -203,10 +203,10 @@
               <thead>
                 <tr>
                   <th style="width: auto">地區</th>
-                  <th style="width: auto">得票率</th>
-                  <th style="width: 16%">當選人</th>
-                  <th style="width: 16%">投票數</th>
-                  <th style="width: 16%">投票率</th>
+                  <th style="width: auto" class="hidden-mobile">得票率</th>
+                  <th style="width: auto">當選人</th>
+                  <th style="width: 16%" class="hidden-mobile">投票數</th>
+                  <th style="width: 16%" class="hidden-mobile">投票率</th>
                   <th style="width: 4%"></th>
                 </tr>
               </thead>
@@ -223,7 +223,7 @@
                   <td>
                     <h4>{{ index }}</h4>
                   </td>
-                  <td>
+                  <td class="hidden-mobile">
                     <div class="overview__percent">
                       <div
                         class="overview__line"
@@ -250,10 +250,10 @@
                       <p>{{ hanleName(index).name }}</p>
                     </div>
                   </td>
-                  <td>
+                  <td class="hidden-mobile">
                     <p>{{ item.total.toLocaleString() }}</p>
                   </td>
-                  <td>
+                  <td class="hidden-mobile">
                     <p>{{ item.rate }}</p>
                   </td>
                   <td>
@@ -978,6 +978,7 @@ const drawBarLine = async () => {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-wrap: wrap;
       margin-bottom: 12px;
 
       h3 {
@@ -985,12 +986,14 @@ const drawBarLine = async () => {
         font-weight: 700;
         line-height: 30px;
         color: #334155;
+        flex-grow: 1;
       }
     }
     .header__list {
       display: flex;
       justify-content: flex-end;
       align-items: center;
+      flex-grow: 1;
     }
     .header__item {
       font-size: 12px;
@@ -1148,5 +1151,8 @@ const drawBarLine = async () => {
 }
 
 @media only screen and (max-width: 768px) {
+  .hidden-mobile {
+    display: none; // 默認隱藏
+  }
 }
 </style>
