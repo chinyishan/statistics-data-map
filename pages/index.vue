@@ -47,6 +47,7 @@
             name="town"
             id="town"
             v-model="params.town"
+            @change="changeSearchTown()"
           >
             <option value="all">all</option>
             <option
@@ -83,7 +84,7 @@
       </div>
       <div class="statistic__main">
         <div class="statistic__wrap">
-          <h2>全臺縣市總統得票</h2>
+          <h2>{{ statisticTitle }}</h2>
           <section class="president">
             <h3>總統得票數</h3>
             <div class="president__row">
@@ -91,16 +92,21 @@
                 <ul class="club__list">
                   <li
                     class="club__item"
-                    v-for="(item, index) in yearsCandidateData[params.year]
-                      .candidate"
+                    v-for="(item, index) in voteCandidate.candidate"
                     :key="index"
                   >
-                    <div class="club__pic" :style="{ background: item.color }">
-                      <img :src="img.imagesSvg[item.pic]" alt="face" />
+                    <div
+                      class="club__pic"
+                      :style="{ background: handleClub(index).color }"
+                    >
+                      <img
+                        :src="img.imagesSvg[handleClub(index).pic]"
+                        :alt="handleClub(index).name"
+                      />
                     </div>
                     <div class="club__text">
                       <h4>{{ index }}</h4>
-                      <h5>{{ item.name }}</h5>
+                      <h5>{{ handleClub(index).name }}</h5>
                       <p>
                         <strong>{{ item.total.toLocaleString() }}</strong
                         >票
@@ -111,10 +117,12 @@
                 <div class="club__percent">
                   <div
                     class="club__line"
-                    v-for="(item, index) in yearsCandidateData[params.year]
-                      .candidate"
+                    v-for="(item, index) in voteCandidate.candidate"
                     :key="index"
-                    :style="{ background: item.color, width: `${item.rate}%` }"
+                    :style="{
+                      background: handleClub(index).color,
+                      width: `${item.rate}%`,
+                    }"
                   >
                     <span>{{ item.rate }}%</span>
                   </div>
@@ -125,32 +133,41 @@
                   <div id="pieRate" ref="pieRate"></div>
                   <div class="rate__sub">
                     <small>投票率</small>
-                    <strong>{{ yearsCandidateData[params.year].rate }}%</strong>
+                    <strong>{{ voteCandidate.rate ? voteCandidate.rate : 0 }}%</strong>
                   </div>
                 </div>
                 <ul class="rate__list">
                   <li class="rate__item">
                     <h4>投票數</h4>
                     <strong>{{
-                      yearsCandidateData[params.year].total.toLocaleString()
+                      voteCandidate.total
+                        ? voteCandidate.total.toLocaleString()
+                        : 0
                     }}</strong>
                   </li>
                   <li class="rate__item">
                     <h4>投票率</h4>
                     <strong
-                      >{{ yearsCandidateData[params.year].rate }} %</strong
+                      >{{
+                        voteCandidate.rate ? voteCandidate.rate : 0
+                      }}
+                      %</strong
                     >
                   </li>
                   <li class="rate__item">
                     <h4>有效票數</h4>
                     <strong>{{
-                      yearsCandidateData[params.year].valid.toLocaleString()
+                      voteCandidate.valid
+                        ? voteCandidate.valid.toLocaleString()
+                        : 0
                     }}</strong>
                   </li>
                   <li class="rate__item">
                     <h4>無效票數</h4>
                     <strong>{{
-                      yearsCandidateData[params.year].invalid.toLocaleString()
+                      voteCandidate.invalid
+                        ? voteCandidate.invalid.toLocaleString()
+                        : 0
                     }}</strong>
                   </li>
                 </ul>
@@ -198,7 +215,7 @@
             </div>
           </section>
           <section class="overview">
-            <h3>各縣市投票總覽</h3>
+            <h3>{{ overviewTitle }}</h3>
             <table>
               <thead>
                 <tr>
@@ -240,22 +257,20 @@
                     <div class="overview__peopel">
                       <div
                         class="overview__pic"
-                        :style="{ background: hanleName(index).color }"
+                        :style="{ background: hanleListName(index).color }"
                       >
                         <img
-                          :src="img.imagesSvg[hanleName(index).pic]"
+                          :src="img.imagesSvg[hanleListName(index).pic]"
                           alt="face"
                         />
                       </div>
-                      <p>{{ hanleName(index).name }}</p>
+                      <p>{{ hanleListName(index).name }}</p>
                     </div>
                   </td>
                   <td class="hidden-mobile">
-                    <p>{{ item.total.toLocaleString() }}</p>
+                    {{ item.total.toLocaleString() }}
                   </td>
-                  <td class="hidden-mobile">
-                    <p>{{ item.rate }}</p>
-                  </td>
+                  <td class="hidden-mobile">{{ item.rate }}</td>
                   <td>
                     <img
                       class="arrow"
@@ -277,19 +292,19 @@
 </template>
 
 <script setup>
-import * as echarts from 'echarts';
-import resource from '@/assets/json/resource.json';
-import taiwanJSON from '@/assets/json/taiwan.json';
-import voteAll from '@/assets/json/vote-all.json';
-import vote2024 from '@/assets/json/vote-2024.json';
-import vote2020 from '@/assets/json/vote-2020.json';
+import * as echarts from "echarts";
+import resource from "@/assets/json/resource.json";
+import taiwanJSON from "@/assets/json/taiwan.json";
+import voteAll from "@/assets/json/vote-all.json";
+import vote2024 from "@/assets/json/vote-2024.json";
+import vote2020 from "@/assets/json/vote-2020.json";
 
 onMounted(() => {
   drawTaiwan();
   drawBarColum();
   drawBarLine();
   drawpieRate();
-  window.addEventListener('resize', function () {
+  window.addEventListener("resize", function () {
     taiwanChart.resize();
     pieRateChart.resize();
     barColumChart.resize();
@@ -306,7 +321,7 @@ const options = reactive({
 });
 
 const optionsTowns = computed(() => {
-  if (params.county !== '' && params.county !== 'all') {
+  if (params.county !== "" && params.county !== "all") {
     return options.county_town
       .filter((i) => params.county.includes(i.label))
       .reduce((acc, item) => acc.concat(item.children), []);
@@ -315,9 +330,9 @@ const optionsTowns = computed(() => {
 });
 
 const params = reactive({
-  year: '2024',
-  county: 'all',
-  town: 'all',
+  year: "2024",
+  county: "all",
+  town: "all",
 });
 
 /**票數統計 */
@@ -329,72 +344,119 @@ const voteInfo = reactive({
 
 /**變更年分 */
 const changeSearchYear = () => {
-  params.county = 'all';
-  params.town = 'all';
+  params.county = "all";
+  params.town = "all";
   drawTaiwan();
+  drawpieRate();
 };
 
 /**變更縣市 */
 const changeSearchCounty = () => {
-  params.town = 'all';
+  params.town = "all";
+  drawpieRate();
+};
+
+const changeSearchTown = () => {
+  drawpieRate();
 };
 
 const changeList = (key) => {
-  if (params.county == 'all' && params.town == 'all') {
+  if (params.county == "all" && params.town == "all") {
     params.county = key; // 更新縣市
-    params.town = 'all';
+    params.town = "all";
   } else {
     params.town = key; // 更新區域
   }
+  drawpieRate();
 };
+
+const statisticTitle = computed(() => {
+  if (params.county !== "all" && params.town == "all") {
+    return `${params.county}總統得票`;
+  }
+  if (params.county !== "all" && params.town !== "all") {
+    return `${params.county}${params.town}總統得票`;
+  }
+  return "全臺縣市總統得票";
+});
+
+const overviewTitle = computed(() => {
+  if (params.county !== "all" && params.town == "all") {
+    return `各鄉鎮市區投票總覽`;
+  }
+  if (params.county !== "all" && params.town !== "all") {
+    return `各村里投票總覽`;
+  }
+  return "各縣市投票總覽";
+});
 
 /**票數清單 */
 const voteList = computed(() => {
   const result = voteInfo[params.year].county || {};
 
   // 縣市
-  if (params.county !== 'all' && params.town == 'all') {
+  if (params.county !== "all" && params.town == "all") {
     return result[params.county]?.towns || {};
   }
   // 地區
-  if (params.county !== 'all' && params.town !== 'all') {
+  if (params.county !== "all" && params.town !== "all") {
     return result[params.county].towns[params.town]?.village || {};
   }
 
   return result;
 });
 
+const voteCandidate = computed(() => {
+  const result = voteInfo[params.year] || {};
+
+  // 縣市
+  if (params.county !== "all" && params.town == "all") {
+    return result.county[params.county] || {};
+  }
+  // 地區
+  if (params.county !== "all" && params.town !== "all") {
+    return result.county[params.county].towns[params.town] || {};
+  }
+
+  return result.all;
+});
+
 /**政黨資料 */
 const partyInfo = reactive({
   民進黨: {
-    pic: 'face-3',
-    color: '#91cc75',
+    pic: "face-3",
+    color: "#91cc75",
   },
   國民黨: {
-    pic: 'face-1',
-    color: '#5470c6',
+    pic: "face-1",
+    color: "#5470c6",
   },
   無黨籍: {
-    pic: 'face-5',
-    color: '#7e7e7e',
+    pic: "face-5",
+    color: "#7e7e7e",
   },
   親民黨: {
-    pic: 'face-4',
-    color: '#faa658',
+    pic: "face-4",
+    color: "#faa658",
   },
   民眾黨: {
-    pic: 'face-2',
-    color: '#4dc1bf',
+    pic: "face-2",
+    color: "#4dc1bf",
   },
 });
+
+const handleClub = (party) => {
+  const all = yearsCandidateData.value[params.year].candidate || {};
+  return all[party];
+};
 
 /**處理顏色 */
 const hanleColor = (party) => {
   return partyInfo[party].color;
 };
 
-/**處理姓名圖片 */
-const hanleName = (countyTown) => {
+/**處理列表姓名圖片 */
+const hanleListName = (countyTown) => {
   const all = yearsCandidateData.value[params.year].candidate || {};
   const candData = voteList.value[countyTown]?.candidate || {}; // 使用可选链避免错误
 
@@ -411,8 +473,8 @@ const hanleName = (countyTown) => {
 
   // 根据最高票数的政黨 all 數據中提取相应的信息
   const highestCandidate = all[highestParty] || {
-    name: '未知',
-    pic: 'face-none',
+    name: "未知",
+    pic: "face-none",
   };
 
   return highestCandidate; // 返回最高票数的候选人信息
@@ -458,18 +520,18 @@ const cityCoords = {
 };
 
 /**台灣地圖 */
-const taiwanMap = ref('');
+const taiwanMap = ref("");
 let taiwanChart = null;
 const drawTaiwan = async () => {
   taiwanChart = echarts.init(taiwanMap.value);
-  echarts.registerMap('taiwan', taiwanJSON); //註冊可用的地圖
+  echarts.registerMap("taiwan", taiwanJSON); //註冊可用的地圖
 
   const option = {
     // 數據系列
     series: [
       {
-        type: 'map',
-        map: 'taiwan',
+        type: "map",
+        map: "taiwan",
         geoIndex: 1,
         aspectScale: 1,
         roam: true,
@@ -478,11 +540,11 @@ const drawTaiwan = async () => {
           min: 1.2,
           max: 3,
         },
-        center: [120.7, 23.7],
+        center: [120.7, 23.6],
         // 高亮
         emphasis: Object.keys(voteList.value).map((key) => ({
           itemStyle: {
-            color: hanleName(key).color || '#ffff',
+            color: hanleListName(key).color || "#ffff",
           },
         })),
         // 選中
@@ -491,41 +553,41 @@ const drawTaiwan = async () => {
         },
         label: {
           show: true,
-          formatter: '{b}',
-          color: '#fff',
-          textBorderColor: '#000',
+          formatter: "{b}",
+          color: "#fff",
+          textBorderColor: "#000",
           textBorderWidth: 2,
           fontSize: 12,
-          fontWeight: 'bold',
-          fontFamily: 'sans-serif',
+          fontWeight: "bold",
+          fontFamily: "sans-serif",
         },
         data: Object.keys(voteList.value).map((key) => ({
           name: key,
           value: 0,
           itemStyle: {
-            areaColor: hanleName(key).color || '#ffffff',
-            borderColor: '#ffffff',
+            areaColor: hanleListName(key).color || "#ffffff",
+            borderColor: "#ffffff",
             borderWidth: 1,
           },
         })),
       },
     ],
     nameMap: {
-      taiwan: '臺灣',
+      taiwan: "臺灣",
     },
     // 顯示資訊
     tooltip: {
-      trigger: 'item',
-      formatter: '{b}',
+      trigger: "item",
+      formatter: "{b}",
     },
   };
 
   taiwanChart.setOption(option);
 
-  taiwanChart.on('click', function (p) {
+  taiwanChart.on("click", function (p) {
     const coords = cityCoords[p.name]; // 獲取對應的坐標
     params.county = p.name;
-    params.town = 'all';
+    params.town = "all";
 
     taiwanChart.setOption({
       series: [
@@ -539,18 +601,18 @@ const drawTaiwan = async () => {
 };
 
 /**圓餅圖 */
-const pieRate = ref('');
+const pieRate = ref("");
 let pieRateChart = null;
 const drawpieRate = () => {
   pieRateChart = echarts.init(pieRate.value);
 
-  const rateValid = yearsCandidateData.value[params.year]?.rate;
+  const rateValid = voteCandidate.value.rate;
 
   const option = {
     series: [
       {
-        type: 'pie',
-        radius: ['80%', '100%'],
+        type: "pie",
+        radius: ["80%", "100%"],
         labelLine: {
           show: false,
         },
@@ -561,13 +623,13 @@ const drawpieRate = () => {
           {
             value: rateValid,
             itemStyle: {
-              color: '#D4009B',
+              color: "#D4009B",
             },
           },
           {
             value: 100 - rateValid,
             itemStyle: {
-              color: '#E2E8F0',
+              color: "#E2E8F0",
             },
           },
         ],
@@ -579,7 +641,7 @@ const drawpieRate = () => {
 };
 
 /**柱狀圖 */
-const barColum = ref('');
+const barColum = ref("");
 let barColumChart = null;
 const drawBarColum = async () => {
   barColumChart = echarts.init(barColum.value);
@@ -607,12 +669,12 @@ const drawBarColum = async () => {
     const color =
       years
         .map((year) => yearsCandidateData.value[year].candidate[party]?.color)
-        .find((c) => c) || '#000000'; // 默認顏色為黑色
+        .find((c) => c) || "#000000"; // 默認顏色為黑色
 
     seriesData.push({
       name: party,
-      type: 'bar',
-      barWidth: '10%',
+      type: "bar",
+      barWidth: "10%",
       data: data,
       itemStyle: {
         color: color, // 設置顏色
@@ -623,24 +685,24 @@ const drawBarColum = async () => {
   const option = {
     // 顯示
     tooltip: {
-      trigger: 'axis',
+      trigger: "axis",
     },
     // 邊距
     grid: {
-      top: '10%',
-      bottom: '10%',
-      left: '10%',
-      right: '2%',
+      top: "10%",
+      bottom: "10%",
+      left: "10%",
+      right: "2%",
     },
     xAxis: {
-      type: 'category',
+      type: "category",
       data: years, // X 軸顯示年份
       axisPointer: {
-        type: 'shadow',
+        type: "shadow",
       },
     },
     yAxis: {
-      type: 'value',
+      type: "value",
       axisLabel: {
         formatter: (value) => `${value / 10000}萬`, // 添加单位“萬”
       },
@@ -652,7 +714,7 @@ const drawBarColum = async () => {
 };
 
 /**折線圖 */
-const barLine = ref('');
+const barLine = ref("");
 let barLineChart = null;
 const drawBarLine = async () => {
   barLineChart = echarts.init(barLine.value);
@@ -680,11 +742,11 @@ const drawBarLine = async () => {
     const color =
       years
         .map((year) => yearsCandidateData.value[year].candidate[party]?.color)
-        .find((c) => c) || '#000000'; // 默認顏色為黑色
+        .find((c) => c) || "#000000"; // 默認顏色為黑色
 
     seriesData.push({
       name: party,
-      type: 'line',
+      type: "line",
       data: data,
       itemStyle: {
         color: color, // 設置顏色
@@ -694,27 +756,27 @@ const drawBarLine = async () => {
 
   const option = {
     grid: {
-      left: '1%',
-      right: '4%',
-      top: '10%',
-      bottom: '2%',
+      left: "1%",
+      right: "4%",
+      top: "10%",
+      bottom: "2%",
       containLabel: true,
     },
     tooltip: {
-      trigger: 'axis',
+      trigger: "axis",
     },
     toolbox: {
       show: true,
     },
     xAxis: {
-      type: 'category',
+      type: "category",
       boundaryGap: true, //置中
       data: years,
     },
     yAxis: {
-      type: 'value',
+      type: "value",
       axisLabel: {
-        formatter: '{value}%',
+        formatter: "{value}%",
       },
     },
     series: seriesData,
@@ -846,13 +908,13 @@ const drawBarLine = async () => {
 
           &.elected {
             &::after {
-              content: '';
+              content: "";
               position: absolute;
               width: 24px;
               height: 24px;
               top: 20px;
               right: 20px;
-              background: no-repeat center url('@/assets/icon/elected.svg');
+              background: no-repeat center url("@/assets/icon/elected.svg");
             }
           }
         }
@@ -1035,8 +1097,7 @@ const drawBarLine = async () => {
       color: #334155;
     }
     table {
-      font-family: 'Oswald', sans-serif;
-      border-collapse: collapse;
+      width: 100%;
     }
     th {
       background-color: #e9ecef;
@@ -1050,12 +1111,12 @@ const drawBarLine = async () => {
       padding: 8px;
       font-size: 14px;
       font-weight: 400;
-      line-height: 24px;
       text-align: left;
       color: #334155;
 
       &:nth-child(1) {
         h4 {
+          display: block;
           font-size: 16px;
           font-weight: 700;
           line-height: 24px;
@@ -1116,6 +1177,7 @@ const drawBarLine = async () => {
   background: #e9ecef;
   padding: 16px 0;
   text-align: center;
+  color: #334155;
 }
 
 @media only screen and (max-width: 1440px) {

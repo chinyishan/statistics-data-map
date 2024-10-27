@@ -84,7 +84,7 @@ video {
   border: 0;
   font-size: 100%;
   font: inherit;
-  vertical-align: baseline;
+  // vertical-align: baseline;
 }
 /* HTML5 display-role reset for older browsers */
 article,
@@ -121,14 +121,4 @@ q:after {
 table {
   border-collapse: collapse;
   border-spacing: 0;
-}
-
-// main 共用
-a {
-  display: block;
-  text-decoration: none;
-}
-img {
-  width: 100%;
-  display: block;
 }
