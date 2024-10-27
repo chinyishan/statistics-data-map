@@ -22,14 +22,16 @@
   .header__logo {
     display: flex;
     align-items: center;
-    gap: 12px;
+    // gap: 12px;
 
     .logo__pic {
       width: 52px;
       height: 34px;
+      margin-right: 12px;
     }
     .logo__title {
       color: #334155;
+      margin-right: 12px;
     }
     .logo__text {
       font-size: 16px;
@@ -161,14 +163,16 @@
 @media only screen and (max-width: 375px) {
   .header {
     .header__logo {
-      gap: 4px;
-
-      .logo__title {
-        font-size: 16px;
-      }
+      // gap: 4px;
+      
       .logo__pic {
         width: 38px;
         height: 24px;
+        margin-right: 6px;
+      }
+      .logo__title {
+        font-size: 16px;
+        margin-right: 6px;
       }
       .select__year {
         width: 70px;

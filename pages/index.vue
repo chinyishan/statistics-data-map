@@ -576,10 +576,10 @@ const drawTaiwan = async () => {
       taiwan: "臺灣",
     },
     // 顯示資訊
-    tooltip: {
-      trigger: "item",
-      formatter: "{b}",
-    },
+    // tooltip: {
+    //   trigger: "item",
+    //   formatter: "{b}",
+    // },
   };
 
   taiwanChart.setOption(option);
