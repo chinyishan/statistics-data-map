@@ -538,7 +538,7 @@ const drawTaiwan = async () => {
         zoom: 1.2,
         scaleLimit: {
           min: 1.2,
-          max: 3,
+          max: 4,
         },
         center: [120.7, 23.6],
         // 高亮
@@ -592,7 +592,7 @@ const drawTaiwan = async () => {
     taiwanChart.setOption({
       series: [
         {
-          zoom: 3,
+          zoom: 4,
           center: coords,
         },
       ],
