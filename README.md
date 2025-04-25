@@ -6,7 +6,9 @@
 
 ## Demo 連結
 
-<a href="https://statistics-data-map.vercel.app/" target="_blank">台灣歷年總統 都幾?</a>
+<a href="https://statistics-data-map.vercel.app/" target="_blank">台灣歷年總統開票連結</a>
+
+https://github.com/user-attachments/assets/bbc04fb1-1ff8-495a-91cb-d9afc7cf1efe
 
 ## 使用技術
 
