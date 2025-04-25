@@ -1,12 +1,12 @@
-# 總統開票全台地圖（Taiwan Election Map）
+# 台灣歷年總統開票全台地圖
 
 ## 專案簡介
 
 本專案為個人 Side Project，目的是練習資料視覺化與地理圖資應用，結合 Vue、Nuxt 與 ECharts，打造出互動式的台灣全區縣市開票結果地圖。使用者可點選地圖查看各縣市的候選人得票情況，並搭配圖表展示票數分布。
 
-## Demo 連結
+## Demo
 
-<a href="https://statistics-data-map.vercel.app/" target="_blank">台灣歷年總統開票連結</a>
+<a href="https://statistics-data-map.vercel.app/" target="_blank">網站連結</a>
 
 https://github.com/user-attachments/assets/bbc04fb1-1ff8-495a-91cb-d9afc7cf1efe
 
@@ -46,6 +46,6 @@ npm run start
 - ECharts 視覺化圖層控制與地圖事件綁定
 - 前端資料結構的整合與資料來源模擬
 
-## 網頁 UI 資料來源
+## 網頁資料來源
 
-<a href="https://2023.thef2e.com/works" target="_blank">六角學院的比賽中參賽者所提供的 UI 設計稿資料</a>
+<a href="https://2023.thef2e.com/works" target="_blank">此UI設計為六角學院比賽中的參賽者所提供的設計稿資料</a>
