@@ -2,7 +2,7 @@
 
 ## 專案簡介
 
-本專案為個人 Side Project，目的是練習資料視覺化與地理圖資應用，結合 Vue、Nuxt 與 ECharts，打造出互動式的台灣全區縣市開票結果地圖。使用者可點選地圖查看各縣市的候選人得票情況，並搭配圖表展示票數分布。
+本專案為參加 六角學院舉辦之競賽活動 的作品，目的是練習資料視覺化與地理圖資應用，結合 Vue、Nuxt 與 ECharts，打造出互動式的台灣全區縣市開票結果地圖。使用者可點選地圖查看各縣市的候選人得票情況，並搭配圖表展示票數分布。
 
 ## Demo
 
@@ -16,6 +16,7 @@ https://github.com/user-attachments/assets/bbc04fb1-1ff8-495a-91cb-d9afc7cf1efe
 - Nuxt3：用於伺服器端渲染（SSR）與路由架構
 - ECharts：資料視覺化（地圖圖層、圓餅圖、長條圖等）
 - SCSS：樣式管理與響應式設計
+- Vercel: 前端部署和託管平台
 
 ## 專案特色
 
@@ -48,4 +49,4 @@ npm run start
 
 ## 網頁資料來源
 
-<a href="https://2023.thef2e.com/works" target="_blank">此UI設計為六角學院比賽中的參賽者所提供的設計稿資料</a>
+<a href="https://2023.thef2e.com/works" target="_blank">此 UI 設計為六角學院比賽中的參賽者所提供的設計稿資料</a>
