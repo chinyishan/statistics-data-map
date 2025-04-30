@@ -133,7 +133,11 @@
                   <div id="pieRate" ref="pieRate"></div>
                   <div class="rate__sub">
                     <small>投票率</small>
-                    <strong>{{ voteCandidate.rate ? voteCandidate.rate : 0 }}%</strong>
+                    <strong
+                      >{{
+                        voteCandidate.rate ? voteCandidate.rate : 0
+                      }}%</strong
+                    >
                   </div>
                 </div>
                 <ul class="rate__list">
@@ -299,19 +303,8 @@ import voteAll from "@/assets/json/vote-all.json";
 import vote2024 from "@/assets/json/vote-2024.json";
 import vote2020 from "@/assets/json/vote-2020.json";
 
-onMounted(() => {
-  drawTaiwan();
-  drawBarColum();
-  drawBarLine();
-  drawpieRate();
-  window.addEventListener("resize", function () {
-    taiwanChart.resize();
-    pieRateChart.resize();
-    barColumChart.resize();
-    barLineChart.resize();
-  });
-});
-
+const route = useRoute();
+const router = useRouter();
 const img = useGlobImg();
 
 /**選項 */
@@ -350,12 +343,13 @@ const changeSearchYear = () => {
   drawpieRate();
 };
 
-/**變更縣市 */
+/** 變更縣市 */
 const changeSearchCounty = () => {
   params.town = "all";
   drawpieRate();
 };
 
+/** 變更區域 */
 const changeSearchTown = () => {
   drawpieRate();
 };
@@ -368,6 +362,34 @@ const changeList = (key) => {
     params.town = key; // 更新區域
   }
   drawpieRate();
+};
+
+// 監聽 params 的變化
+watch(
+  params,
+  (newParams) => {
+    router.push({ query: { ...newParams } });
+  },
+  { deep: true }
+);
+
+// 監聽路由 query 的變化
+watch(
+  () => route.query,
+  (newQuery) => {
+    // 調用重新獲取資料的方法
+    handleRefreshQuery(newQuery);
+  },
+  { deep: true }
+);
+
+/** 重新獲取查詢資料 */
+const handleRefreshQuery = (query) => {
+  // 根據新的 query 參數來獲取資料
+  console.log("查詢參數:", query);
+  params.year = query.year;
+  params.county = query.county;
+  params.town = query.town;
 };
 
 const statisticTitle = computed(() => {
@@ -784,6 +806,20 @@ const drawBarLine = async () => {
 
   barLineChart.setOption(option);
 };
+
+onMounted(() => {
+  drawTaiwan();
+  drawBarColum();
+  drawBarLine();
+  drawpieRate();
+  window.addEventListener("resize", function () {
+    taiwanChart.resize();
+    pieRateChart.resize();
+    barColumChart.resize();
+    barLineChart.resize();
+  });
+  router.push({ query: { ...params } });
+});
 </script>
 <style lang="scss">
 .statistic {
